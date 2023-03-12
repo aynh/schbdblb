@@ -21,7 +21,7 @@
 	} as Record<string, string>;
 	$: duration = formatDuration(
 		intervalToDuration({ start: $time, end: active ? selesai : mulai }),
-	).replace(/(day|hour|minute|second)s?/g, (v) => localeReplacement[v.slice(0, -1)]);
+	).replace(/(day|hour|minute|second)s?/g, (_, v) => localeReplacement[v]);
 	$: content = active ? `Tinggal ${duration} lagi` : `${duration} lagi mulai`;
 </script>
 
