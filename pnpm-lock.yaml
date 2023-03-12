@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@iconify-json/lucide': ^1.1.69
   '@sveltejs/adapter-auto': ^2.0.0
   '@sveltejs/kit': ^1.5.0
   prettier: ^2.8.0
@@ -19,6 +20,7 @@ dependencies:
   the-new-css-reset: 1.8.4
 
 devDependencies:
+  '@iconify-json/lucide': 1.1.69
   '@sveltejs/adapter-auto': 2.0.0_@sveltejs+kit@1.10.0
   '@sveltejs/kit': 1.10.0_svelte@3.55.1+vite@4.1.4
   prettier: 2.8.4
@@ -254,6 +256,12 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@iconify-json/lucide/1.1.69:
+    resolution: {integrity: sha512-z9IOgknFYJ92AvhtnKoGO0fT3DB6NF9FwL4iCS+fFA8hVYIRAxEjY9TGDyXo/SqlD//khUSpWKoVy48zp1C/qA==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
 
   /@iconify/types/2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
