@@ -10,7 +10,7 @@
 
 	$: [mulai, selesai] = [periode.mulai, periode.selesai].map(({ jam, menit }) => {
 		const date = $time.getDate() + hari - $time.getDay();
-		return setTime($time, { date, hours: jam, minutes: menit, milliseconds: 0, seconds: 0 });
+		return setTime($time, { date, hours: jam, minutes: menit ?? 0, milliseconds: 0, seconds: 0 });
 	});
 
 	const localeReplacement = {
