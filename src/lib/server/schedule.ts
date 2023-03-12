@@ -31,7 +31,7 @@ export const periode: Periode[] = [
 	},
 ];
 
-export const jadwal: { [key in Hari]?: Jadwal[] } = {
+export const jadwal: { [key in Hari | number]?: Jadwal[] } = {
 	[Hari.senin]: [
 		{ nama: 'SBD 2', dosen: 'TRI WAHYU Q, M.Kom', periode: periode[0], ruangan: 2 },
 		{ nama: 'KOMPAK', dosen: 'AMALIA, MSI', periode: periode[1], ruangan: 2 },
@@ -57,7 +57,7 @@ export const processJadwal = (it: typeof jadwal) => {
 		([hari, jadwal]) =>
 			[
 				Hari[Number(hari)],
-				jadwal.map(({ periode: { mulai, selesai }, ...rest }) => ({
+				jadwal!.map(({ periode: { mulai, selesai }, ...rest }) => ({
 					...rest,
 					mulai: `${padded(mulai.jam)}:${padded(mulai.menit ?? 0)}`,
 					selesai: `${padded(selesai.jam)}:${padded(selesai.menit ?? 0)}`,
