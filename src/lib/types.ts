@@ -1,11 +1,11 @@
 export enum Hari {
-	senin = 1,
+	minggu,
+	senin,
 	selasa,
 	rabu,
 	kamis,
 	jumat,
 	sabtu,
-	minggu,
 }
 
 export interface Jadwal {
