@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { computePosition, offset, shift } from '@floating-ui/dom';
 
+	let dark = false;
+
+	const toggleDark = () => {
+		dark = document.documentElement.classList.toggle('dark');
+		if (floatingElement != undefined) {
+			floatingElement.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
+		}
+	};
+
 	let floatingReference: HTMLElement;
 	let floatingElement: HTMLElement;
 	let floating = false;
@@ -38,11 +47,19 @@
 				<a href="/realtime">Jadwal Realtime</a>
 			</li>
 		</ul>
-		<button
-			bind:this={floatingReference}
-			on:click={() => toggleFloating()}
-			class="md:hidden w-6 h-6 i-lucide-menu"
-		/>
+		<div class="space-x-2">
+			<button
+				on:click={() => toggleDark()}
+				class:i-lucide-moon={dark}
+				class:i-lucide-sun={!dark}
+				class="w-6 md:w-8 h-6 md:h-8"
+			/>
+			<button
+				bind:this={floatingReference}
+				on:click={() => toggleFloating()}
+				class="md:hidden w-6 h-6 i-lucide-menu"
+			/>
+		</div>
 	</nav>
 </div>
 
