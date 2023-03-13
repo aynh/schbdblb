@@ -34,7 +34,7 @@
 
 <div class="w-full border border-b-solid px-8 py-4">
 	<nav class="relative flex items-center justify-between">
-		<a class="font-semibold uppercase text-lg" href="/">schbdblb</a>
+		<a class="flex-1 font-semibold uppercase text-lg" href="/">schbdblb</a>
 		<ul
 			bind:this={floatingElement}
 			class:hidden={!floating}
@@ -47,7 +47,7 @@
 				<a href="/realtime">Jadwal Realtime</a>
 			</li>
 		</ul>
-		<div class="space-x-2">
+		<div class="flex-1 flex justify-end space-x-2">
 			<button
 				on:click={() => toggleDark()}
 				class:i-lucide-moon={dark}
