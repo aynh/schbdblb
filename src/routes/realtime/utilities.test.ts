@@ -1,7 +1,7 @@
 import { periode } from '$lib/server/schedule';
 import { Hari, type Jadwal } from '$lib/types';
 import { describe, expect, it } from 'vitest';
-import { periodeIsInRange, resolveNextJadwal } from './utilities';
+import { periodeIsInRange, resolveNextJadwal, resolvePreviousJadwal } from './utilities';
 
 describe('periode in range', () => {
 	type Args = Parameters<typeof periodeIsInRange>;
@@ -40,7 +40,7 @@ describe('periode in range', () => {
 	});
 });
 
-describe('resolve next jadwal', async () => {
+describe('resolve jadwal', async () => {
 	const jadwal: Record<number, Jadwal[]> = {
 		[Hari.senin]: [
 			{ nama: 'SBD 2', dosen: 'TRI WAHYU Q, M.Kom', periode: periode[0], ruangan: 2 },
@@ -50,7 +50,7 @@ describe('resolve next jadwal', async () => {
 			{ nama: 'VISUAL 1', dosen: 'M. SAIDI N, M.Kom', periode: periode[0], ruangan: 6 },
 			{ nama: 'STR DATA', dosen: 'MUTIA F, M.Kom', periode: periode[1], ruangan: 6 },
 		],
-		[Hari.rabu]: [
+		[Hari.jumat]: [
 			{ nama: 'PANCA', dosen: 'SULAIMAN, M.Pd', periode: periode[2], ruangan: 6 },
 			{ nama: 'KOMDAT', dosen: 'M. RUSDI, M.Kom', periode: periode[3], ruangan: 6 },
 		],
@@ -59,13 +59,103 @@ describe('resolve next jadwal', async () => {
 		([key, values]) => [Number(key), values] as [number, Jadwal[]],
 	);
 
-	describe.each<{ from: Jadwal; to: [Hari, Jadwal] }>([
+	type Result = ReturnType<typeof resolveNextJadwal>;
+
+	describe.each<{ from: Jadwal; to: Result }>([
 		{ from: jadwal[Hari.selasa][0], to: [Hari.selasa, jadwal[Hari.selasa][1]] }, // next in the same day
 		{ from: jadwal[Hari.senin][1], to: [Hari.selasa, jadwal[Hari.selasa][0]] }, // next in different day
-		{ from: jadwal[Hari.rabu][1], to: [Hari.senin, jadwal[Hari.senin][0]] }, // next in different day (wrap around)
-	])('should resolve next', ({ from, to }) => {
+		{ from: jadwal[Hari.jumat][1], to: [Hari.senin, jadwal[Hari.senin][0]] }, // next in different day (wrap around)
+	])('should resolve next based on value', ({ from, to }) => {
 		it(`${from.nama} -> ${to[1].nama}`, () => {
 			expect(resolveNextJadwal(jadwalEntries, from)).toStrictEqual(to);
+		});
+	});
+
+	describe.each<{ hari: Hari; jam?: number; menit?: number; to: Result }>([
+		{
+			// in-between 2 jadwal
+			hari: Hari.senin,
+			jam: 9,
+			menit: 40,
+			to: [Hari.senin, jadwal[Hari.senin][1]],
+		},
+		{
+			// before jadwal has started
+			hari: Hari.selasa,
+			jam: 7,
+			to: [Hari.selasa, jadwal[Hari.selasa][0]],
+		},
+		{
+			// after ALL jadwal has started
+			hari: Hari.selasa,
+			jam: 12,
+			menit: 20,
+			to: [Hari.jumat, jadwal[Hari.jumat][0]],
+		},
+		{
+			// in a day without jadwal
+			hari: Hari.rabu,
+			to: [Hari.jumat, jadwal[Hari.jumat][0]],
+		},
+		{
+			// in a day without jadwal (wrap-around)
+			hari: Hari.minggu,
+			to: [Hari.senin, jadwal[Hari.senin][0]],
+		},
+	])('should resolve next based on date', ({ hari, jam, menit, to }) => {
+		it(`${Hari[hari]} ${jam}:${menit} -> ${to[1].nama}`, () => {
+			const date = new Date();
+			date.setHours(jam ?? 0);
+			date.setMinutes(menit ?? 0);
+			if (date.getDay() !== hari) {
+				date.setDate(date.getDate() + hari - date.getDay());
+			}
+
+			expect(resolveNextJadwal(jadwalEntries, undefined, { date })).toStrictEqual(to);
+		});
+	});
+
+	describe.each<{ hari: Hari; jam?: number; menit?: number; to: Jadwal }>([
+		{
+			// in-between 2 jadwal
+			hari: Hari.senin,
+			jam: 9,
+			menit: 40,
+			to: jadwal[Hari.senin][0],
+		},
+		{
+			// before jadwal has started
+			hari: Hari.selasa,
+			jam: 7,
+			to: jadwal[Hari.senin][1],
+		},
+		{
+			// after ALL jadwal has started
+			hari: Hari.selasa,
+			jam: 12,
+			menit: 20,
+			to: jadwal[Hari.selasa][1],
+		},
+		{
+			// in a day without jadwal
+			hari: Hari.rabu,
+			to: jadwal[Hari.selasa][1],
+		},
+		{
+			// in a day without jadwal (wrap-around)
+			hari: Hari.minggu,
+			to: jadwal[Hari.jumat][1],
+		},
+	])('should resolve previous', ({ hari, jam, menit, to }) => {
+		it(`${Hari[hari]} ${jam}:${menit} -> ${to.nama}`, () => {
+			const date = new Date();
+			date.setHours(jam ?? 0);
+			date.setMinutes(menit ?? 0);
+			if (date.getDay() !== hari) {
+				date.setDate(date.getDate() + hari - date.getDay());
+			}
+
+			expect(resolvePreviousJadwal(jadwalEntries, { date })).toStrictEqual(to);
 		});
 	});
 });

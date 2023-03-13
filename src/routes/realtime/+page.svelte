@@ -16,7 +16,7 @@
 	$: jadwalNow = jadwalToday?.find(({ periode }) =>
 		periodeIsInRange(periode, $time.getHours(), $time.getMinutes()),
 	);
-	$: [jadwalNextHari, jadwalNext] = resolveNextJadwal(jadwalEntries, jadwalNow);
+	$: [jadwalNextHari, jadwalNext] = resolveNextJadwal(jadwalEntries, jadwalNow, { date: $time });
 </script>
 
 <svelte:head>
