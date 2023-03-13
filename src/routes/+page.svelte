@@ -36,7 +36,7 @@
 </script>
 
 <svelte:head>
-	<title>schbdblb</title>
+	<title>schbdblb - Jadwal Harian</title>
 </svelte:head>
 
 <div class="flex flex-col items-center justify-evenly h-100vh">
