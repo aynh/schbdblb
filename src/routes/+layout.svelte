@@ -1,8 +1,14 @@
 <script>
+	import AppNavigation from '$lib/components/AppNavigation.svelte';
 	import 'the-new-css-reset';
 </script>
 
-<slot />
+<div class="flex flex-col h-100vh">
+	<AppNavigation />
+	<div class="flex-1">
+		<slot />
+	</div>
+</div>
 
 <style uno:preflights global>
 	body {

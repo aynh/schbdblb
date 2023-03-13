@@ -39,7 +39,7 @@
 	<title>schbdblb - Jadwal Harian</title>
 </svelte:head>
 
-<div class="flex flex-col items-center justify-evenly h-100vh">
+<div class="flex flex-col items-center justify-evenly h-full">
 	<h1 class="capitalize font-semibold text-2xl">Jadwal hari {hari}</h1>
 	<div class="flex flex-col items-center space-y-4">
 		{#each jadwal as { nama, dosen, mulai, ruangan, selesai }}

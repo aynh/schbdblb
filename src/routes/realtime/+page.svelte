@@ -23,7 +23,7 @@
 	<title>schbdblb - Jadwal Realtime</title>
 </svelte:head>
 
-<div class="flex flex-col items-center justify-evenly h-100vh">
+<div class="flex flex-col items-center justify-evenly h-full">
 	<h1 class="capitalize font-semibold text-3xl">jadwal realtime</h1>
 	<div class="md:w-full lt-md:h-2/3 flex lt-md:flex-col justify-evenly">
 		<div class="flex flex-col items-center space-y-1">

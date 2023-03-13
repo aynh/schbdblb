@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@floating-ui/dom': ^1.2.4
   '@iconify-json/lucide': ^1.1.69
   '@sveltejs/adapter-auto': ^2.0.0
   '@sveltejs/adapter-vercel': ^2.3.1
@@ -19,6 +20,7 @@ specifiers:
   vitest: ^0.29.0
 
 dependencies:
+  '@floating-ui/dom': 1.2.4
   date-fns: 2.29.3
   the-new-css-reset: 1.8.4
 
@@ -260,6 +262,16 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@floating-ui/core/1.2.3:
+    resolution: {integrity: sha512-upVRtrNZuYNsw+EoxkiBFRPROnU8UTy/u/dZ9U0W14BlemPYODwhhxYXSR2Y9xOnvr1XtptJRWx7gL8Te1qaog==}
+    dev: false
+
+  /@floating-ui/dom/1.2.4:
+    resolution: {integrity: sha512-4+k+BLhtWj+peCU60gp0+rHeR8+Ohqx6kjJf/lHMnJ8JD5Qj6jytcq1+SZzRwD7rvHKRhR7TDiWWddrNrfwQLg==}
+    dependencies:
+      '@floating-ui/core': 1.2.3
+    dev: false
 
   /@iconify-json/lucide/1.1.69:
     resolution: {integrity: sha512-z9IOgknFYJ92AvhtnKoGO0fT3DB6NF9FwL4iCS+fFA8hVYIRAxEjY9TGDyXo/SqlD//khUSpWKoVy48zp1C/qA==}
