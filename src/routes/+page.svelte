@@ -1,17 +1,38 @@
 <script lang="ts">
+	import { time } from '$lib/stores';
 	import { Hari } from '$lib/types';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 
 	$: keys = Object.keys(data);
-	let hari = Hari[new Date().getDay()];
+	let hari = Hari[$time.getDay()];
 
-	$: jadwal = data[hari] ?? data[(hari = keys[0])];
-
-	$: jadwalIndex = keys.findIndex((key) => key === hari);
+	$: jadwal = data[hari];
+	$: jadwalIndex = keys.indexOf(hari);
 	$: previous = keys.at(jadwalIndex - 1)!;
 	$: next = keys.at((jadwalIndex + 1) % keys.length)!;
+
+	onMount(() => {
+		if (jadwal === undefined) {
+			// jika jadwal hari ini kosong, ganti ke jadwal pertama
+			hari = keys[0];
+		} else {
+			const jadwalTerakhir = jadwal.at(-1)!;
+			const [jam, menit] = jadwalTerakhir.selesai.split(':').map(Number);
+			// jika jadwal hari ini sudah selesai, ganti ke jadwal besok
+			if ($time.getHours() > jam || ($time.getHours() === jam && $time.getMinutes() > menit)) {
+				const hari_ = Hari[$time.getDay() + 1];
+				// jika jadwal besok kosong, ganti ke jadwal pertama saja
+				if (data[hari_] === undefined) {
+					hari = keys[0];
+				} else {
+					hari = hari_;
+				}
+			}
+		}
+	});
 </script>
 
 <svelte:head>
