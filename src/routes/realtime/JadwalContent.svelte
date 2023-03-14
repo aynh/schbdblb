@@ -9,7 +9,7 @@
 <script lang="ts">
 	import { time } from '$lib/stores';
 	import { Hari, type Jadwal } from '$lib/types';
-	import { formatDuration, intervalToDuration, set as setTime } from 'date-fns';
+	import { intervalToDuration, set as setTime } from 'date-fns';
 
 	export let hari: Hari;
 	export let status: StatusJadwal;
@@ -21,24 +21,23 @@
 		return setTime($time, { date, hours: jam, minutes: menit ?? 0, milliseconds: 0, seconds: 0 });
 	});
 
-	const localeReplacement = {
-		day: 'hari',
-		hour: 'jam',
-		minute: 'menit',
-		second: 'detik',
-	} as Record<string, string>;
-	$: duration = formatDuration(
-		intervalToDuration({ start: $time, end: status === StatusJadwal.sekarang ? selesai : mulai }),
-	).replace(/(day|hour|minute|second)s?/g, (_, v) => localeReplacement[v]);
+	$: duration = intervalToDuration({
+		start: $time,
+		end: status === StatusJadwal.selanjutnya ? mulai : selesai,
+	});
 
 	let content = '';
 	$: {
+		const { days = 0, hours = 0, minutes = 0, seconds = 0 } = duration;
+		const jam = days * 24 + hours;
+
+		const s = `${jam} jam, ${minutes} menit, dan ${seconds} detik`;
 		if (status === StatusJadwal.sebelumnya) {
-			content = `Selesai ${duration} lalu`;
+			content = `Selesai ${s} lalu`;
 		} else if (status === StatusJadwal.sekarang) {
-			content = `Tinggal ${duration} lagi`;
+			content = `Tinggal ${s} lagi`;
 		} else {
-			content = `${duration} lagi mulai`;
+			content = `${s} lagi mulai`;
 		}
 	}
 </script>
