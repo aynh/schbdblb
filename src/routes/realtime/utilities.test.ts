@@ -59,92 +59,51 @@ describe('resolve jadwal', async () => {
 		([key, values]) => [Number(key), values] as [number, Jadwal[]],
 	);
 
-	type Result = ReturnType<typeof resolveNextJadwal>;
-
-	describe.each<{ from: Jadwal; to: Result }>([
-		{ from: jadwal[Hari.selasa][0], to: [Hari.selasa, jadwal[Hari.selasa][1]] }, // next in the same day
-		{ from: jadwal[Hari.senin][1], to: [Hari.selasa, jadwal[Hari.selasa][0]] }, // next in different day
-		{ from: jadwal[Hari.jumat][1], to: [Hari.senin, jadwal[Hari.senin][0]] }, // next in different day (wrap around)
-	])('should resolve next based on value', ({ from, to }) => {
-		it(`${from.nama} -> ${to[1].nama}`, () => {
+	describe.each<{ from: Jadwal; to: ReturnType<typeof resolveNextJadwal> }>([
+		{ from: jadwal[Hari.selasa][0], to: { hari: Hari.selasa, ...jadwal[Hari.selasa][1] } }, // next in the same day
+		{ from: jadwal[Hari.senin][1], to: { hari: Hari.selasa, ...jadwal[Hari.selasa][0] } }, // next in different day
+		{ from: jadwal[Hari.jumat][1], to: { hari: Hari.senin, ...jadwal[Hari.senin][0] } }, // next in different day (wrap around)
+	])('should resolve next', ({ from, to }) => {
+		it(`${from.nama} -> ${to.nama}`, () => {
 			expect(resolveNextJadwal(jadwalEntries, from)).toStrictEqual(to);
 		});
 	});
 
-	describe.each<{ hari: Hari; jam?: number; menit?: number; to: Result }>([
+	describe.each<{
+		hari: Hari;
+		jam?: number;
+		menit?: number;
+		to: ReturnType<typeof resolvePreviousJadwal>;
+	}>([
 		{
 			// in-between 2 jadwal
 			hari: Hari.senin,
 			jam: 9,
 			menit: 40,
-			to: [Hari.senin, jadwal[Hari.senin][1]],
+			to: { hari: Hari.senin, ...jadwal[Hari.senin][0] },
 		},
 		{
 			// before jadwal has started
 			hari: Hari.selasa,
 			jam: 7,
-			to: [Hari.selasa, jadwal[Hari.selasa][0]],
+			to: { hari: Hari.senin, ...jadwal[Hari.senin][1] },
 		},
 		{
 			// after ALL jadwal has started
 			hari: Hari.selasa,
 			jam: 12,
 			menit: 20,
-			to: [Hari.jumat, jadwal[Hari.jumat][0]],
+			to: { hari: Hari.selasa, ...jadwal[Hari.selasa][1] },
 		},
 		{
 			// in a day without jadwal
 			hari: Hari.rabu,
-			to: [Hari.jumat, jadwal[Hari.jumat][0]],
+			to: { hari: Hari.selasa, ...jadwal[Hari.selasa][1] },
 		},
 		{
 			// in a day without jadwal (wrap-around)
 			hari: Hari.minggu,
-			to: [Hari.senin, jadwal[Hari.senin][0]],
-		},
-	])('should resolve next based on date', ({ hari, jam, menit, to }) => {
-		it(`${Hari[hari]} ${jam}:${menit} -> ${to[1].nama}`, () => {
-			const date = new Date();
-			date.setHours(jam ?? 0);
-			date.setMinutes(menit ?? 0);
-			if (date.getDay() !== hari) {
-				date.setDate(date.getDate() + hari - date.getDay());
-			}
-
-			expect(resolveNextJadwal(jadwalEntries, undefined, { date })).toStrictEqual(to);
-		});
-	});
-
-	describe.each<{ hari: Hari; jam?: number; menit?: number; to: Jadwal }>([
-		{
-			// in-between 2 jadwal
-			hari: Hari.senin,
-			jam: 9,
-			menit: 40,
-			to: jadwal[Hari.senin][0],
-		},
-		{
-			// before jadwal has started
-			hari: Hari.selasa,
-			jam: 7,
-			to: jadwal[Hari.senin][1],
-		},
-		{
-			// after ALL jadwal has started
-			hari: Hari.selasa,
-			jam: 12,
-			menit: 20,
-			to: jadwal[Hari.selasa][1],
-		},
-		{
-			// in a day without jadwal
-			hari: Hari.rabu,
-			to: jadwal[Hari.selasa][1],
-		},
-		{
-			// in a day without jadwal (wrap-around)
-			hari: Hari.minggu,
-			to: jadwal[Hari.jumat][1],
+			to: { hari: Hari.jumat, ...jadwal[Hari.jumat][1] },
 		},
 	])('should resolve previous', ({ hari, jam, menit, to }) => {
 		it(`${Hari[hari]} ${jam}:${menit} -> ${to.nama}`, () => {
@@ -155,7 +114,7 @@ describe('resolve jadwal', async () => {
 				date.setDate(date.getDate() + hari - date.getDay());
 			}
 
-			expect(resolvePreviousJadwal(jadwalEntries, { date })).toStrictEqual(to);
+			expect(resolvePreviousJadwal(jadwalEntries, date)).toStrictEqual(to);
 		});
 	});
 });

@@ -10,34 +10,30 @@ export const periodeIsInRange = ({ mulai, selesai }: Periode, jam: number, menit
 	}
 };
 
-export const resolveNextJadwal = (
-	entries: [Hari, Jadwal[]][],
-	jadwalNow?: Jadwal,
-	{ date = new Date() } = {},
-): [Hari, Jadwal] => {
-	// jika jadwal tidak ada, cari jadwal sebelumnya
-	const jadwalNow_ = jadwalNow ?? resolvePreviousJadwal(entries, { date });
+export type ResolvedJadwal = Jadwal & { hari: Hari };
 
+export const resolveNextJadwal = (entries: [Hari, Jadwal[]][], base: Jadwal): ResolvedJadwal => {
 	const nameEntries = entries.map(([, values]) => values.map(({ nama }) => nama));
-	const entryIndex = nameEntries.findIndex((values) => values.includes(jadwalNow_!.nama));
+	const entryIndex = nameEntries.findIndex((values) => values.includes(base.nama));
 
 	const names = nameEntries[entryIndex];
 	const [hari, jadwal] = entries[entryIndex];
 	// coba pilih jadwal selanjutnya dihari yang sama
-	const next = jadwal.at(names.indexOf(jadwalNow_.nama) + 1);
+	const next = jadwal.at(names.indexOf(base.nama) + 1);
 	if (next !== undefined) {
-		return [hari, next];
+		return { hari, ...next };
 	}
 
 	// kalau tidak ada, ambil jadwal pertama dihari berikutnya
 	const [hari_, jadwal_] = entries[(entryIndex + 1) % entries.length];
-	return [hari_, jadwal_[0]];
+	return { hari: hari_, ...jadwal_[0] };
 };
 
-export const resolvePreviousJadwal = (entries: [Hari, Jadwal[]][], { date = new Date() } = {}) => {
+export const resolvePreviousJadwal = (entries: [Hari, Jadwal[]][], date: Date): ResolvedJadwal => {
 	// coba mencari jadwal sebelumnya di hari yang sama
-	const jadwalToday = entries.find(([hari]) => hari === date.getDay())?.[1];
-	if (jadwalToday !== undefined) {
+	const todayEntry = entries.find(([hari]) => hari === date.getDay());
+	if (todayEntry !== undefined) {
+		const [hari, jadwalToday] = todayEntry;
 		const [jam, menit] = [date.getHours(), date.getMinutes()];
 		const match = jadwalToday.find(({ periode: { selesai } }, index) => {
 			// jika waktu jadwal sudah dilewati:
@@ -54,7 +50,7 @@ export const resolvePreviousJadwal = (entries: [Hari, Jadwal[]][], { date = new 
 		});
 
 		if (match !== undefined) {
-			return match;
+			return { hari, ...match };
 		}
 	}
 
@@ -66,7 +62,8 @@ export const resolvePreviousJadwal = (entries: [Hari, Jadwal[]][], { date = new 
 		const entry = entries.find(([hari]) => hari === date_.getDay());
 		if (entry !== undefined) {
 			// gunakan jadwal terakhir
-			return entry[1].at(-1)!;
+			const [hari, jadwal] = entry;
+			return { hari, ...jadwal.at(-1)! };
 		}
 	}
 };
