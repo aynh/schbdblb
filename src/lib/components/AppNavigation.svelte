@@ -1,6 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { computePosition, offset, shift } from '@floating-ui/dom';
 	import { onMount } from 'svelte';
+
+	$: ({ kelas } = $page.params);
+	$: title = kelas === undefined ? 'schbdblb' : `schbdblb - ${kelas.toUpperCase()}`;
 
 	let dark = false;
 
@@ -51,19 +55,25 @@
 
 <div class="w-full border border-b-solid px-8 py-4">
 	<nav class="relative flex items-center justify-between">
-		<a class="flex-1 font-semibold uppercase text-lg" href="/">schbdblb</a>
-		<ul
-			bind:this={floatingElement}
-			class:hidden={!floating}
-			class="dropdown underline md:flex md:space-x-4"
-		>
-			<li>
-				<a href="/">Jadwal Harian</a>
-			</li>
-			<li>
-				<a href="/realtime">Jadwal Realtime</a>
-			</li>
-		</ul>
+		<div class="flex-1">
+			<a class="font-semibold uppercase text-lg" href="/">{title}</a>
+		</div>
+
+		{#if kelas !== undefined}
+			<ul
+				bind:this={floatingElement}
+				class:hidden={!floating}
+				class="dropdown underline md:flex md:space-x-4"
+			>
+				<li>
+					<a href="/{kelas}">Jadwal Harian</a>
+				</li>
+				<li>
+					<a href="/{kelas}/realtime">Jadwal Realtime</a>
+				</li>
+			</ul>
+		{/if}
+
 		<div class="flex-1 flex justify-end space-x-2">
 			<button
 				on:click={() => toggleDark()}
@@ -71,11 +81,14 @@
 				class:i-lucide-sun={!dark}
 				class="w-6 md:w-8 h-6 md:h-8"
 			/>
-			<button
-				bind:this={floatingReference}
-				on:click={() => toggleFloating()}
-				class="md:hidden w-6 h-6 i-lucide-menu"
-			/>
+
+			{#if kelas !== undefined}
+				<button
+					bind:this={floatingReference}
+					on:click={() => toggleFloating()}
+					class="md:hidden w-6 h-6 i-lucide-menu"
+				/>
+			{/if}
 		</div>
 	</nav>
 </div>

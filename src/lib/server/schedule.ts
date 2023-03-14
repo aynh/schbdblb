@@ -1,4 +1,4 @@
-import { Hari, type Jadwal, type Periode } from '$lib/types';
+import { Hari, Kelas, type Jadwal, type Periode } from '$lib/types';
 
 export const periode: Periode[] = [
 	{
@@ -31,24 +31,45 @@ export const periode: Periode[] = [
 	},
 ];
 
-export const jadwal: { [key in Hari | number]?: Jadwal[] } = {
-	[Hari.senin]: [
-		{ nama: 'SBD 2', dosen: 'TRI WAHYU Q, M.Kom', periode: periode[0], ruangan: 2 },
-		{ nama: 'KOMPAK', dosen: 'AMALIA, MSI', periode: periode[1], ruangan: 2 },
-	],
-	[Hari.selasa]: [
-		{ nama: 'VISUAL 1', dosen: 'M. SAIDI N, M.Kom', periode: periode[0], ruangan: 6 },
-		{ nama: 'STR DATA', dosen: 'MUTIA F, M.Kom', periode: periode[1], ruangan: 6 },
-	],
-	[Hari.rabu]: [
-		{ nama: 'PANCA', dosen: 'SULAIMAN, M.Pd', periode: periode[2], ruangan: 6 },
-		{ nama: 'KOMDAT', dosen: 'M. RUSDI, M.Kom', periode: periode[3], ruangan: 6 },
-	],
-	[Hari.kamis]: [
-		{ nama: 'SIM', dosen: 'HAYATI N, M.Pd', periode: periode[0], ruangan: 2 },
-		{ nama: 'DISKRIT', dosen: 'ADANI D, M.Kom', periode: periode[1], ruangan: 2 },
-	],
-	[Hari.jumat]: [{ nama: 'ALGO 2', dosen: 'PUTRA, M.Kom', periode: periode[0], ruangan: 2 }],
+export const jadwal: { [key in Kelas]: { [key in Hari | number]?: Jadwal[] } } = {
+	[Kelas['2a']]: {
+		[Hari.senin]: [
+			{ nama: 'KOMPAK', dosen: 'AMALIA, MSI', periode: periode[0], ruangan: 1 },
+			{ nama: 'SBD 1', dosen: 'TRI WAHYU Q, M.Kom', periode: periode[1], ruangan: 1 },
+		],
+		[Hari.selasa]: [
+			{ nama: 'STR DATA', dosen: 'MUTIA F, M.Kom', periode: periode[0], ruangan: 5 },
+			{ nama: 'VISUAL 1', dosen: 'M. SAIDI N, M.Kom', periode: periode[1], ruangan: 5 },
+		],
+		[Hari.rabu]: [
+			{ nama: 'KOMDAT', dosen: 'M. RUSDI, M.Kom', periode: periode[2], ruangan: 5 },
+			{ nama: 'PANCA', dosen: 'SULAIMAN, M.Pd', periode: periode[3], ruangan: 5 },
+		],
+		[Hari.kamis]: [
+			{ nama: 'DISKRIT', dosen: 'ADANI D, M.Kom', periode: periode[0], ruangan: 1 },
+			{ nama: 'SIM', dosen: 'HAYATI N, M.Pd', periode: periode[1], ruangan: 1 },
+		],
+		[Hari.jumat]: [{ nama: 'ALGO 2', dosen: 'PUTRA, M.Kom', periode: periode[1], ruangan: 1 }],
+	},
+	[Kelas['2b']]: {
+		[Hari.senin]: [
+			{ nama: 'SBD 2', dosen: 'TRI WAHYU Q, M.Kom', periode: periode[0], ruangan: 2 },
+			{ nama: 'KOMPAK', dosen: 'AMALIA, MSI', periode: periode[1], ruangan: 2 },
+		],
+		[Hari.selasa]: [
+			{ nama: 'VISUAL 1', dosen: 'M. SAIDI N, M.Kom', periode: periode[0], ruangan: 6 },
+			{ nama: 'STR DATA', dosen: 'MUTIA F, M.Kom', periode: periode[1], ruangan: 6 },
+		],
+		[Hari.rabu]: [
+			{ nama: 'PANCA', dosen: 'SULAIMAN, M.Pd', periode: periode[2], ruangan: 6 },
+			{ nama: 'KOMDAT', dosen: 'M. RUSDI, M.Kom', periode: periode[3], ruangan: 6 },
+		],
+		[Hari.kamis]: [
+			{ nama: 'SIM', dosen: 'HAYATI N, M.Pd', periode: periode[0], ruangan: 2 },
+			{ nama: 'DISKRIT', dosen: 'ADANI D, M.Kom', periode: periode[1], ruangan: 2 },
+		],
+		[Hari.jumat]: [{ nama: 'ALGO 2', dosen: 'PUTRA, M.Kom', periode: periode[0], ruangan: 2 }],
+	},
 };
 
 if (import.meta.vitest) {
@@ -73,5 +94,28 @@ if (import.meta.vitest) {
 				}
 			}
 		}
+	});
+
+	it('jadwal harus terurut', () => {
+		const periodeMulaiJam = periode.map(({ mulai: { jam } }) => jam);
+		const sorted = Object.entries(jadwal)
+			.sort(([a], [b]) => Number(a) - Number(b))
+			.map(([key, value]): [string, [string, (typeof jadwal)[Kelas][number]][]] => [
+				key,
+				Object.entries(value)
+					.sort(([a], [b]) => Number(a) - Number(b))
+					.map(([valueKey, valueValue]): [string, (typeof jadwal)[Kelas][Hari]] => [
+						valueKey,
+						valueValue!.sort(
+							(a, b) =>
+								periodeMulaiJam.indexOf(a.periode.mulai.jam) -
+								periodeMulaiJam.indexOf(b.periode.mulai.jam),
+						),
+					]),
+			]);
+
+		expect(sorted).toStrictEqual(
+			Object.entries(jadwal).map(([key, value]) => [key, Object.entries(value)]),
+		);
 	});
 }

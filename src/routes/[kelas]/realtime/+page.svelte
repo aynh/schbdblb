@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { time } from '$lib/stores';
 	import type { Jadwal } from '$lib/types';
 	import { periodeIsActive } from '$lib/utilities';
@@ -39,7 +40,7 @@
 </script>
 
 <svelte:head>
-	<title>schbdblb - Jadwal Realtime</title>
+	<title>schbdblb {$page.params.kelas.toUpperCase()} - Jadwal Realtime</title>
 </svelte:head>
 
 <div class="flex flex-col items-center h-full">

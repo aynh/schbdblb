@@ -8,12 +8,16 @@ export enum Hari {
 	sabtu,
 }
 
+export enum Kelas {
+	'2a',
+	'2b',
+}
+
 export interface Jadwal {
 	nama: string;
 	dosen: string;
 	periode: Periode;
-	ruangan: Ruangan;
+	ruangan: number;
 }
 
 export type Periode = Record<'mulai' | 'selesai', { jam: number; menit?: number }>;
-export type Ruangan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
