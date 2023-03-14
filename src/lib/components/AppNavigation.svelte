@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { computePosition, offset, shift } from '@floating-ui/dom';
+	import { onMount } from 'svelte';
 
 	let dark = false;
 
 	const toggleDark = () => {
 		dark = document.documentElement.classList.toggle('dark');
-		if (floatingElement != undefined) {
-			floatingElement.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
-		}
 	};
 
 	let floatingReference: HTMLElement;
@@ -30,6 +28,25 @@
 					'';
 		}
 	};
+
+	onMount(() => {
+		const handleClick = async (event: Event) => {
+			// jika floating sedang aktif:
+			if (floating) {
+				const target = event.target as Node;
+				// jika di click diluar dari floatingElement dan floatingReference:
+				if (!floatingElement.contains(target) && !floatingReference.contains(target)) {
+					// hilangkan floating
+					await toggleFloating();
+				}
+			}
+		};
+
+		document.addEventListener('click', handleClick, true);
+		return () => {
+			document.removeEventListener('click', handleClick, true);
+		};
+	});
 </script>
 
 <div class="w-full border border-b-solid px-8 py-4">
