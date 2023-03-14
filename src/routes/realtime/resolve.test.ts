@@ -1,46 +1,9 @@
 import { periode } from '$lib/server/schedule';
 import { Hari, type Jadwal } from '$lib/types';
 import { describe, expect, it } from 'vitest';
-import { periodeIsInRange, resolveNextJadwal, resolvePreviousJadwal } from './utilities';
+import { resolveNextJadwal, resolvePreviousJadwal } from './resolve';
 
-describe('periode in range', () => {
-	type Args = Parameters<typeof periodeIsInRange>;
-
-	describe.each<Args>([
-		[{ mulai: { jam: 8 }, selesai: { jam: 10 } }, 8, 0],
-		[{ mulai: { jam: 8 }, selesai: { jam: 10 } }, 10, 0],
-		[{ mulai: { jam: 8, menit: 20 }, selesai: { jam: 10, menit: 40 } }, 8, 20],
-		[{ mulai: { jam: 8, menit: 20 }, selesai: { jam: 10, menit: 40 } }, 10, 40],
-	])('exactly at mulai and selesai', (...args) => {
-		it('should match', () => {
-			expect(periodeIsInRange(...args)).toBe(true);
-		});
-	});
-
-	describe.each([
-		...Array.from({ length: 7 }, (_, n) => [n + 1, -(n + 1)]),
-		...Array.from({ length: 7 }, (_, n) => [-(n + 1), n + 1]),
-	])('incremented by $1 $2', (a, b) => {
-		const periode = { mulai: { jam: 8, menit: 20 }, selesai: { jam: 10, menit: 40 } };
-
-		it('should not match', () => {
-			expect(periodeIsInRange(periode, a, b)).toBe(false);
-		});
-	});
-
-	describe.each<Args>([
-		[{ mulai: { jam: 9 }, selesai: { jam: 10 } }, 9, 20],
-		[{ mulai: { jam: 9 }, selesai: { jam: 10 } }, 9, 40],
-		[{ mulai: { jam: 9, menit: 20 }, selesai: { jam: 10, menit: 40 } }, 9, 40],
-		[{ mulai: { jam: 9, menit: 20 }, selesai: { jam: 10, menit: 40 } }, 10, 20],
-	])('in range', (...args) => {
-		it('should match', () => {
-			expect(periodeIsInRange(...args)).toBe(true);
-		});
-	});
-});
-
-describe('resolve jadwal', async () => {
+describe('resolve jadwal', () => {
 	const jadwal: Record<number, Jadwal[]> = {
 		[Hari.senin]: [
 			{ nama: 'SBD 2', dosen: 'TRI WAHYU Q, M.Kom', periode: periode[0], ruangan: 2 },

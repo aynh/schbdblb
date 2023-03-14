@@ -1,13 +1,9 @@
 <script lang="ts">
 	import { time } from '$lib/stores';
 	import type { Jadwal } from '$lib/types';
-	import {
-		periodeIsInRange,
-		resolveNextJadwal,
-		resolvePreviousJadwal,
-		type ResolvedJadwal,
-	} from './utilities';
+	import { periodeIsActive } from '$lib/utilities';
 	import type { PageData } from './$types';
+	import { resolveNextJadwal, resolvePreviousJadwal, type ResolvedJadwal } from './resolve';
 	import JadwalContent, { StatusJadwal } from './JadwalContent.svelte';
 
 	export let data: PageData;
@@ -24,7 +20,7 @@
 	let jadwalNow: ResolvedJadwal | undefined = undefined;
 	$: {
 		const match = jadwalToday?.find(({ periode }) =>
-			periodeIsInRange(periode, $time.getHours(), $time.getMinutes()),
+			periodeIsActive(periode, $time.getHours(), $time.getMinutes()),
 		);
 		if (match !== undefined) {
 			jadwalNow = { hari: today, ...match };

@@ -1,14 +1,5 @@
-import type { Hari, Jadwal, Periode } from '$lib/types';
-
-export const periodeIsInRange = ({ mulai, selesai }: Periode, jam: number, menit: number) => {
-	if (jam === mulai.jam) {
-		return menit >= (mulai.menit ?? 0);
-	} else if (jam === selesai.jam) {
-		return menit <= (selesai.menit ?? 0);
-	} else {
-		return jam > mulai.jam && jam < selesai.jam;
-	}
-};
+import type { Hari, Jadwal } from '$lib/types';
+import { periodeIsFuture, periodeIsPast } from '$lib/utilities';
 
 export type ResolvedJadwal = Jadwal & { hari: Hari };
 
@@ -35,16 +26,15 @@ export const resolvePreviousJadwal = (entries: [Hari, Jadwal[]][], date: Date): 
 	if (todayEntry !== undefined) {
 		const [hari, jadwalToday] = todayEntry;
 		const [jam, menit] = [date.getHours(), date.getMinutes()];
-		const match = jadwalToday.find(({ periode: { selesai } }, index) => {
+		const match = jadwalToday.find(({ periode }, index) => {
 			// jika waktu jadwal sudah dilewati:
-			if (selesai.jam < jam || (selesai.jam === jam && menit >= (selesai.menit ?? 0))) {
-				const next = jadwalToday.at(index + 1)?.periode.mulai;
+			if (periodeIsPast(periode, jam, menit)) {
+				const next = jadwalToday.at(index + 1)?.periode;
 				return (
 					// jika tidak ada jadwal selanjutnya
 					next === undefined ||
 					// atau jika jadwal selanjutnya belum lewat
-					next.jam > jam ||
-					(next.jam === jam && menit <= (next.menit ?? 0))
+					periodeIsFuture(next, jam, menit)
 				);
 			}
 		});
