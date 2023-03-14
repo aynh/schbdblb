@@ -51,23 +51,6 @@ export const jadwal: { [key in Hari | number]?: Jadwal[] } = {
 	[Hari.jumat]: [{ nama: 'ALGO 2', dosen: 'PUTRA, M.Kom', periode: periode[0], ruangan: 2 }],
 };
 
-export const processJadwal = (it: typeof jadwal) => {
-	const padded = (n: number) => n.toString().padStart(2, '0');
-	const entries = Object.entries(it).map(
-		([hari, jadwal]) =>
-			[
-				Hari[Number(hari)],
-				jadwal!.map(({ periode: { mulai, selesai }, ...rest }) => ({
-					...rest,
-					mulai: `${padded(mulai.jam)}:${padded(mulai.menit ?? 0)}`,
-					selesai: `${padded(selesai.jam)}:${padded(selesai.menit ?? 0)}`,
-				})),
-			] as const,
-	);
-
-	return Object.fromEntries(entries);
-};
-
 if (import.meta.vitest) {
 	const { expect, it } = import.meta.vitest;
 
@@ -87,28 +70,6 @@ if (import.meta.vitest) {
 					expect(menit).not.toBeNaN();
 					expect(menit).toBeGreaterThanOrEqual(0);
 					expect(menit).toBeLessThanOrEqual(60);
-				}
-			}
-		}
-	});
-
-	it('should process', () => {
-		const processed = processJadwal(jadwal);
-		expect(Object.entries(processed)).toHaveLength(Object.entries(jadwal).length);
-
-		const keys = Object.keys(jadwal).map((key) => Hari[Number(key)]);
-		expect(keys).toStrictEqual(Object.keys(processed));
-
-		for (const values of Object.values(processed)) {
-			for (const { mulai, selesai } of values) {
-				for (const value of [mulai, selesai]) {
-					expect(value).toContain(':');
-					expect(value).toHaveLength(5);
-
-					for (const split of value.split(':')) {
-						expect(split).toHaveLength(2);
-						expect(Number(split)).not.toBeNaN();
-					}
 				}
 			}
 		}
